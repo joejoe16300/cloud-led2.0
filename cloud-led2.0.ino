@@ -32,6 +32,11 @@
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
+#include "DHT.h"
+#define DHTPIN 14     // Digital pin connected to the DHT sensor
+#define DHTTYPE DHT11   // DHT 11
+DHT dht(DHTPIN, DHTTYPE);
+float h, t;
 
 
 char auth[] = "BidLe1JUPW3aGswQDs5j08pREtmXmYMo";
@@ -39,6 +44,9 @@ char auth[] = "BidLe1JUPW3aGswQDs5j08pREtmXmYMo";
 static const char ntpServerName[] = "time.nist.gov";
 const int timeZone = 8; //BeiJing in China
 int tmp;//温度
+String  shimiao;
+String  yueri;
+
 WiFiUDP Udp;
 WiFiClient client;
 #define PIN 12 
@@ -88,10 +96,11 @@ void setup()
     Serial.begin(115200);
     strip.begin();
     strip.setBrightness(75);
-
     strip.show(); // Initialize all pixels to 'off'
+    dht.begin();
 
     u8g2.begin();
+
     wifi_start_connect();
     client.setTimeout(5000);//设置服务器连接超时时间
 
@@ -157,15 +166,71 @@ void loop()
         }
 
     }
+    readdht();
 
-
-
+    dislay();
 
 
     delay(5000);
 }
 
-void wifi_start_connect()              //连接WIFI
+void dislay() {
+    
+    u8g2.clearBuffer();
+
+
+    u8g2.setFont(u8g2_font_ncenB10_tr);
+    u8g2.setCursor(0, 15);
+    u8g2.print(tmp);
+
+    u8g2.setFont(u8g2_font_ncenB10_tr);
+    u8g2.setCursor(17, 15);
+    u8g2.print("C");
+
+
+    u8g2.setFont(u8g2_font_ncenB10_tr);
+    u8g2.setCursor(27, 15);
+    u8g2.print("/");
+    u8g2.setCursor(32, 15);
+    u8g2.print(t);
+    u8g2.setCursor(60, 15);
+    u8g2.print("C");
+    u8g2.setCursor(75, 15);
+    u8g2.print(h);
+    u8g2.setCursor(97, 15);
+    u8g2.print("%");
+
+   
+    u8g2.setFont(u8g2_font_ncenB08_tr);
+    u8g2.drawStr(0, 64, "XN");
+    u8g2.setFont(u8g2_font_unifont_t_symbols);
+    u8g2.drawGlyph(110, 64, 0x2665);
+
+
+    u8g2.setFont(u8g2_font_helvB24_tf);
+    u8g2.setCursor(27, 50);
+    u8g2.print(shimiao);
+
+    u8g2.setFont(u8g2_font_helvB12_tf);
+    u8g2.setCursor(54, 64);
+    u8g2.print(yueri);
+
+
+
+    u8g2.sendBuffer();
+
+
+}
+
+
+void readdht() {
+    h = dht.readHumidity();
+    
+    t = dht.readTemperature();
+}
+
+ //连接WIFI
+void wifi_start_connect()             
 {
     WiFi.mode(WIFI_STA);
 
@@ -282,48 +347,12 @@ void digitalClockDisplay()
 
     Serial.println();
 
-    String  shimiao = String(hour()) + ":" + String(minute());
-    String  yueri = String(month()) + "-" + String(day());
+    shimiao = String(hour()) + ":" + String(minute());
+    yueri = String(month()) + "-" + String(day());
 
 
     Serial.print("yueri==");
     Serial.print(yueri);
-
-
-    u8g2.clearBuffer();
-
-
-    u8g2.setFont(u8g2_font_courB10_tn);
-    u8g2.setCursor(0, 15);
-    u8g2.print(tmp);
-
-    u8g2.setFont(u8g2_font_courB10_tn);
-    u8g2.setCursor(19, 15);
-    u8g2.print("c");
-
-
-    u8g2.setFont(u8g2_font_ncenB10_tr);
-    u8g2.drawStr(18, 15, "C");
-    u8g2.setFont(u8g2_font_ncenB08_tr);
-    u8g2.drawStr(70, 15, "Xi-Ning");
-
-    u8g2.setFont(u8g2_font_unifont_t_symbols);
-    u8g2.drawGlyph(110, 64, 0x2665);
-
-
-    u8g2.setFont(u8g2_font_helvB24_tf);
-    u8g2.setCursor(27, 50);
-    u8g2.print(shimiao);
-
-    u8g2.setFont(u8g2_font_helvB12_tf);
-    u8g2.setCursor(54, 64);
-    u8g2.print(yueri);
-
-
-
-    u8g2.sendBuffer();
-
-
 
 
 }

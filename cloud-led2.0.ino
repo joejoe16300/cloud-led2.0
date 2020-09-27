@@ -4,10 +4,7 @@
  Author:	joe
 */
 /*
- Name:		cloud_led.ino
- Created:	2020/9/26 13:25:19
- Author:	joe
-*/
+
 //ws2812¿â
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__

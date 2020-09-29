@@ -49,10 +49,12 @@ String  yueri;
 
 WiFiUDP Udp;
 WiFiClient client;
+const char ssid[] = "lang";  //  your network SSID (name)
+
+const char pass[] = "57954626";       // your network password
 #define PIN 12 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(12, PIN, NEO_GRB + NEO_KHZ800);
-
-
+int index_wave[591] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4,4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15,16, 16, 17, 18, 18, 19, 20, 20, 21, 22, 23, 24, 25, 25, 26, 27, 28, 30, 31, 32, 33, 34, 36, 37, 38, 40, 41, 43, 45, 46, 48, 50, 52,54, 56, 58, 60, 62, 65, 67, 70, 72, 75, 78, 81, 84, 87, 90, 94, 97, 101, 105, 109, 113, 117, 122, 126, 131, 136, 141, 146, 152, 158,164, 170, 176, 183, 190, 197, 205, 213, 221, 229, 238, 247, 256, 256, 247, 238, 229, 221, 213, 205, 197, 190, 183, 176, 170, 164, 158,152, 146, 141, 136, 131, 126, 122, 117, 113, 109, 105, 101, 97, 94, 90, 87, 84, 81, 78, 75, 72, 70, 67, 65, 62, 60, 58, 56, 54, 52, 50,48, 46, 45, 43, 41, 40, 38, 37, 36, 34, 33, 32, 31, 30, 28, 27, 26, 25, 25, 24, 23, 22, 21, 20, 20, 19, 18, 18, 17, 16, 16, 15, 15, 14,14, 13, 13, 12, 12, 11, 11, 10, 10, 10, 9, 9, 9, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3,3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };      //创建一个数组，用来储存每次延时的亮度
 
 unsigned int localPort = 8888;  // local port to listen for UDP packets
 
@@ -171,11 +173,18 @@ void loop()
     dislay();
 
 
-    delay(5000);
+    delay(3000);
 }
 
+
+
+
+
+
+
+
 void dislay() {
-    
+
     u8g2.clearBuffer();
 
 
@@ -200,7 +209,7 @@ void dislay() {
     u8g2.setCursor(97, 15);
     u8g2.print("%");
 
-   
+
     u8g2.setFont(u8g2_font_ncenB08_tr);
     u8g2.drawStr(0, 64, "XN");
     u8g2.setFont(u8g2_font_unifont_t_symbols);
@@ -225,12 +234,12 @@ void dislay() {
 
 void readdht() {
     h = dht.readHumidity();
-    
+
     t = dht.readTemperature();
 }
 
- //连接WIFI
-void wifi_start_connect()             
+//连接WIFI
+void wifi_start_connect()
 {
     WiFi.mode(WIFI_STA);
 
@@ -247,6 +256,8 @@ void wifi_start_connect()
                     Serial.println("SmartConfig: Success");
                     break;
                 }
+               
+                
                 Serial.print("|");
             }
         }
@@ -281,32 +292,31 @@ void parseUserData(String content)  // Json数据解析并串口打印.可参考https://www.
     const char* results_0_last_update = results_0["last_update"];
 
     Serial.println(results_0_location_name);                       //通过串口打印出需要的信息
-    Serial.println(results_0_now_text);
+   /* Serial.println(results_0_now_text);
     Serial.println(results_0_now_code);
     Serial.println(results_0_now_temperature);
     Serial.println(results_0_last_update);
-    Serial.print("\r\n");
+    Serial.print("\r\n");*/
 
 
     tmp = results_0_now["temperature"].as<int>();
 
-    Serial.print("temp===");
-    Serial.print(tmp);
+    /* Serial.print("temp===");
+     Serial.print(tmp);*/
 
-    //colorWipe(strip.Color(139, 69, 19), 50); //  	 	马鞍棕色
+     //colorWipe(strip.Color(139, 69, 19), 50); //  	 	马鞍棕色
 
 
 
     if (tmp <= 15)
     {
-        colorWipe(strip.Color(0, 139, 139), 1); // 
-        delay(1000);
-        colorWipe1(strip.Color(0, 0, 0), 1); //  	 
+        colorWipe3(strip.Color(0, 139, 139), 1); // 
+
 
     }
     else
     {
-        colorWipe(strip.Color(218, 165, 32), 1); //  	 	
+        colorWipe3(strip.Color(218, 165, 32), 1); //  	 	
 
     }
     // u8g2.clearBuffer();
@@ -327,32 +337,32 @@ void digitalClockDisplay()
 
     // digital clock display of the time
 
-    Serial.print(hour());
+    //Serial.print(hour());
 
-    printDigits(minute());
+    //printDigits(minute());
 
-    printDigits(second());
+    //printDigits(second());
 
-    Serial.print(" ");
+    //Serial.print(" ");
 
-    Serial.print(day());
+    //Serial.print(day());
 
-    Serial.print(".");
+    //Serial.print(".");
 
-    Serial.print(month());
+    //Serial.print(month());
 
-    Serial.print(".");
+    //Serial.print(".");
 
-    Serial.print(year());
+    //Serial.print(year());
 
-    Serial.println();
+    //Serial.println();
 
     shimiao = String(hour()) + ":" + String(minute());
     yueri = String(month()) + "-" + String(day());
 
 
-    Serial.print("yueri==");
-    Serial.print(yueri);
+    /* Serial.print("yueri==");
+     Serial.print(yueri);*/
 
 
 }
@@ -513,3 +523,20 @@ void colorWipe1(uint32_t c, uint8_t wait) {
 }
 
 
+void colorWipe3(uint32_t c, uint8_t wait) {
+
+    for (int b = 0; b < 591; b++)
+    {
+        strip.setBrightness(index_wave[b]);
+        for (uint16_t i = 0; i < strip.numPixels(); i++) {
+            strip.setPixelColor(i, c);
+            strip.show();
+            delay(wait);
+        }
+    }
+
+
+
+
+
+}
